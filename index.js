@@ -8,20 +8,28 @@ const server = http.createServer((req, res) => {
     const parser = new XMLParser();
     const jsonData = parser.parse(xmlData);
     const currencies = jsonData.exchange.currency;
-    const newXMLData = {
-        data: {
-            exchange: currencies.map((currency) => ({
-                date: currency.exchangedate,
-                rate: currency.rate,
-            })),
-        },
-    };
 
-    const builder = new XMLBuilder({});
-    const xmlres = builder.build(newXMLData);
+    // Перевірка, чи currencies є об'єктом перед використанням його в коді
+    if (typeof currencies === 'object' && currencies !== null) {
+        const newXMLData = {
+            data: {
+                exchange: {
+                    date: currencies.exchangedate,
+                    rate: currencies.rate,
+                },
+            },
+        };
 
-    res.setHeader('Content-Type', 'text/xml');
-    res.end(xmlres);
+        const builder = new XMLBuilder({});
+        const xmlres = builder.build(newXMLData);
+
+        res.setHeader('Content-Type', 'text/xml');
+        res.end(xmlres);
+    } else {
+        console.error('Неправильний формат даних для currencies.');
+        res.statusCode = 500; // Internal Server Error
+        res.end('Internal Server Error: ' + JSON.stringify(currencies));
+    }
 });
 
 server.listen(port, () => {
