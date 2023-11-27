@@ -9,7 +9,6 @@ const server = http.createServer((req, res) => {
     const jsonData = parser.parse(xmlData);
     const currencies = jsonData.exchange.currency;
 
-    // Перевірка, чи currencies є об'єктом перед використанням його в коді
     if (typeof currencies === 'object' && currencies !== null) {
         const newXMLData = {
             data: {
